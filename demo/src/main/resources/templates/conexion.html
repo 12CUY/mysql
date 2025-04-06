@@ -1,0 +1,28 @@
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estado de Conexión</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 50px; }
+        .status { font-size: 24px; padding: 20px; border-radius: 5px; display: inline-block; }
+        .success { color: green; border: 2px solid green; }
+        .error { color: red; border: 2px solid red; }
+    </style>
+</head>
+<body>
+    <h1>Estado de la Conexión</h1>
+    <p id="mensaje" class="status">Verificando...</p>
+
+    <script>
+        fetch('/conexion')
+            .then(response => response.json())
+            .then(data => {
+                const mensajeElemento = document.getElementById('mensaje');
+                mensajeElemento.innerText = data.mensaje;
+                mensajeElemento.classList.add(data.mensaje.includes('✅') ? 'success' : 'error');
+            })
+            .catch(error => console.error("Error al obtener el estado de conexión:", error));
+    </script>
+</body>
+</html>
