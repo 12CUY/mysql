@@ -1,26 +1,35 @@
-package com.ejemplo.demo.controller;
+package com.example.demo.controller;
 
-import com.ejemplo.demo.service.JwtTokenService;
-import com.ejemplo.demo.service.JwtUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 
-@RestController
+import com.example.demo.entity.Usuario;
+import com.example.demo.services.UsuarioService;
+
+@Controller
 public class AuthController {
 
     @Autowired
-    private JwtTokenService jwtTokenService;
+    private UsuarioService usuarioService;
 
-    @Autowired
-    private JwtUserDetailsService jwtUserDetailsService;
+    @GetMapping("/login")
+    public String loginPage() {
+        return "login";
+    }
 
-    @PostMapping("/authenticate")
-    public String authenticate(@RequestParam String username, @RequestParam String password) {
-        // Validar usuario y contraseña (se puede integrar con una base de datos)
-        if (jwtUserDetailsService.validateUser(username, password)) {
-            return jwtTokenService.generateToken(username);
-        } else {
-            throw new RuntimeException("Invalid credentials");
-        }
+    @GetMapping("/registro")
+    public String registroPage(Model model) {
+        model.addAttribute("usuario", new Usuario());
+        return "registro";
+    }
+
+    @PostMapping("/registro")
+    public String registrar(@ModelAttribute Usuario usuario) {
+        usuarioService.guardar(usuario);
+        return "redirect:/login";
     }
 }

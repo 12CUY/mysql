@@ -1,0 +1,27 @@
+<form id="loginForm">
+  <input type="text" id="email" placeholder="Correo" />
+  <input type="password" id="contrasena" placeholder="Contraseña" />
+  <button type="submit">Ingresar</button>
+</form>
+
+<script>
+document.getElementById("loginForm").addEventListener("submit", async function(e) {
+  e.preventDefault();
+  const email = document.getElementById("email").value;
+  const contrasena = document.getElementById("contrasena").value;
+
+  const response = await fetch("/api/auth/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, contrasena })
+  });
+
+  if (response.ok) {
+    const token = await response.text();
+    localStorage.setItem("jwt", token);
+    window.location.href = "/dashboard";
+  } else {
+    alert("Error al iniciar sesión");
+  }
+});
+</script>

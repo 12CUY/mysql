@@ -1,13 +1,26 @@
 package com.example.demo.controller;
 
+import com.example.demo.Repository.UsuarioRepository;
+
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class WebController {
 
-    @GetMapping("/conexion.html")
-    public String conexionPagina() {
-        return "conexion";
-    }
+    @Autowired
+    private UsuarioRepository usuarioRepo;
+
+    @Autowired
+    private PasswordEncoder encoder;
+
+    // Eliminar el método con la ruta /login
+    // @GetMapping("/login")
+    // public String login() {
+    //     return "login";
+    // }
+
 }

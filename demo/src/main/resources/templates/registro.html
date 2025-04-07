@@ -1,0 +1,6 @@
+<form th:action="@{/registro}" th:object="${usuario}" method="post">
+  <input type="text" th:field="*{nombre}" placeholder="Nombre" />
+  <input type="email" th:field="*{email}" placeholder="Email" />
+  <input type="password" th:field="*{contrasena}" placeholder="Contraseña" />
+  <button type="submit">Registrarse</button>
+</form>
