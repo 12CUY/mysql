@@ -1,6 +1,30 @@
-<form th:action="@{/registro}" th:object="${usuario}" method="post">
-  <input type="text" th:field="*{nombre}" placeholder="Nombre" />
-  <input type="email" th:field="*{email}" placeholder="Email" />
-  <input type="password" th:field="*{contrasena}" placeholder="Contraseña" />
+<h2>Registro</h2>
+<form id="registroForm">
+  <input type="text" id="nombre" placeholder="Nombre" required />
+  <input type="email" id="email" placeholder="Email" required />
+  <input type="password" id="contrasena" placeholder="Contraseña" required />
   <button type="submit">Registrarse</button>
 </form>
+
+<script>
+document.getElementById("registroForm").addEventListener("submit", async function(e) {
+  e.preventDefault();
+
+  const nombre = document.getElementById("nombre").value;
+  const email = document.getElementById("email").value;
+  const contrasena = document.getElementById("contrasena").value;
+
+  const response = await fetch("/api/auth/registro", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ nombre, email, contrasena })
+  });
+
+  if (response.ok) {
+    alert("Usuario registrado correctamente");
+    window.location.href = "/login";
+  } else {
+    alert("Error al registrar");
+  }
+});
+</script>

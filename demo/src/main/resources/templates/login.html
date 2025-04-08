@@ -1,16 +1,17 @@
 <form id="loginForm">
-  <input type="text" id="email" placeholder="Correo" />
-  <input type="password" id="contrasena" placeholder="Contraseña" />
+  <input type="email" id="email" placeholder="Email" required />
+  <input type="password" id="contrasena" placeholder="Contraseña" required />
   <button type="submit">Ingresar</button>
 </form>
 
 <script>
 document.getElementById("loginForm").addEventListener("submit", async function(e) {
   e.preventDefault();
+
   const email = document.getElementById("email").value;
   const contrasena = document.getElementById("contrasena").value;
 
-  const response = await fetch("/api/auth/login", {
+  const response = await fetch("/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, contrasena })
@@ -19,9 +20,11 @@ document.getElementById("loginForm").addEventListener("submit", async function(e
   if (response.ok) {
     const token = await response.text();
     localStorage.setItem("jwt", token);
+    localStorage.setItem("email", email);
     window.location.href = "/dashboard";
   } else {
-    alert("Error al iniciar sesión");
+    const error = await response.text();
+    alert("Error: " + error);
   }
 });
 </script>

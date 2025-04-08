@@ -16,17 +16,20 @@ public class AuthController {
     @Autowired
     private UsuarioService usuarioService;
 
+    // Muestra la página de login
     @GetMapping("/login")
     public String loginPage() {
-        return "login";
+        return "login"; // login.html
     }
 
+    // Muestra la página de registro
     @GetMapping("/registro")
     public String registroPage(Model model) {
         model.addAttribute("usuario", new Usuario());
-        return "registro";
+        return "registro"; // registro.html
     }
 
+    // Procesa el registro desde formulario (opcional, puedes mover a un RestController si usas fetch)
     @PostMapping("/registro")
     public String registrar(@ModelAttribute Usuario usuario) {
         usuarioService.guardar(usuario);

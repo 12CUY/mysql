@@ -9,32 +9,65 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    private final String SECRET = "CLAVESECRETA123";
-    private final long EXPIRATION = 1000 * 60 * 60;
+    private String secretKey = "mi-clave-secreta"; // Asegúrate de guardarla de manera segura en un archivo de configuración
 
+    // Método para generar el token
     public String generateToken(UserDetails userDetails) {
         return Jwts.builder()
-                .setSubject(userDetails.getUsername())
+                .setSubject(userDetails.getUsername())  // Usar el username en lugar de UserDetails directamente
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
-                .signWith(SignatureAlgorithm.HS256, SECRET)
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // Expira en 1 hora
+                .signWith(SignatureAlgorithm.HS256, secretKey) // Firma del token
                 .compact();
     }
 
+    // Método para extraer el nombre de usuario del token
+    public String extractUsername(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(secretKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
+    }
+
+    // Método para verificar si el token ha expirado
+    private boolean isTokenExpired(String token) {
+        return extractExpiration(token).before(new Date());
+    }
+
+    // Método para obtener la fecha de expiración del token
+    private Date extractExpiration(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(secretKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getExpiration();
+    }
+
+    // Método para validar el token
     public boolean validateToken(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
-        return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
+        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
-    public String extractUsername(String token) {
-        return getClaims(token).getSubject();
+    // Método para verificar si el token es válido
+    public boolean isValid(String token) {
+        try {
+            Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
+            return true;
+        } catch (JwtException e) {
+            return false;
+        }
     }
 
-    public boolean isTokenExpired(String token) {
-        return getClaims(token).getExpiration().before(new Date());
+    public Claims getClaims(String token) {
+        return Jwts.parserBuilder()
+                   .setSigningKey(secretKey)
+                   .build()
+                   .parseClaimsJws(token)
+                   .getBody();
     }
-
-    private Claims getClaims(String token) {
-        return Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token).getBody();
-    }
+    
 }
