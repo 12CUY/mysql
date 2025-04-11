@@ -1,0 +1,85 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(to right, #d4c850, #a0ce5f);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+form {
+    background-color: #f8f8f4;
+    border-radius: 10px;
+    padding: 2rem;
+    width: 300px;
+    box-shadow: 0 10px 25px rgba(0, 128, 0, 0.3);
+    text-align: center;
+    position: relative;
+}
+
+h1 {
+    margin-top: 70px;
+    margin-bottom: 1rem;
+    color: #2e7d32;
+    font-size: 24px;
+}
+
+input[type="text"], input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    padding-left: 35px;
+    font-weight: 600;
+}
+
+input[type="text"]::placeholder, input[type="password"]::placeholder {
+    color: #888;
+}
+
+button {
+    width: 100%;
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px;
+    border: none;
+    font-weight: bold;
+    border-radius: 5px;
+    margin-top: 10px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+.extra {
+    margin-top: 15px;
+    font-size: 14px;
+}
+
+.extra a {
+    color: #8B4513;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.avatar {
+    position: absolute;
+    top: -60px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    border-radius: 50%;
+    padding: 10px;
+    box-shadow: 0 0 10px rgba(0, 200, 0, 0.5);
+}
+
+.avatar img {
+    width: 80px;
+    height: 80px;
+}

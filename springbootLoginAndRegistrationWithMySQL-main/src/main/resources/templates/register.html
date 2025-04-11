@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Registro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(to right, #d4c850, #a0ce5f);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        form {
+            background-color: #f8f8f4;
+            border-radius: 12px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 350px;
+            box-shadow: 0 10px 25px rgba(0, 128, 0, 0.3);
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 1.5rem;
+            color: #2e7d32;
+            font-size: 24px;
+        }
+
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 12px 12px 12px 35px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 6px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+            font-weight: 600;
+        }
+
+        input::placeholder {
+            color: #888;
+        }
+
+        button {
+            width: 100%;
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px;
+            border: none;
+            font-weight: bold;
+            border-radius: 6px;
+            margin-top: 15px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .extra {
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .extra a {
+            color: #8B4513;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        @media (max-width: 400px) {
+            h1 {
+                font-size: 20px;
+            }
+
+            form {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <form action="/register" method="post">
+        <h1>Taxation Land <br> Registro</h1>
+        Usuario: <input placeholder="Email" type="text" name="username" /><br/>
+        Contraseña: <input placeholder="Contraseña" type="password" name="password" /><br/>
+        <button type="submit">Registrarse</button>
+        <div class="extra">
+            ¿Ya tienes cuenta? <a href="/login">Inicia sesión</a>
+        </div>
+    </form>
+</body>
+</html>
