@@ -1,101 +1,51 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>Inicio Sesion</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        * {
-            box-sizing: border-box;
-        }
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🥑 Taxation Land - login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"
+    />
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="/style/login.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="avatar" id="lottie" style="width: 120px; height: 120px"></div>
+      <form action="/login" method="post">
+        <h2 style="color: green">Taxation Land</h2>
 
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(to right, #d4c850, #a0ce5f);
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        form {
-            background-color: #f8f8f4;
-            border-radius: 12px;
-            padding: 2rem;
-            width: 90%;
-            max-width: 350px;
-            box-shadow: 0 10px 25px rgba(0, 128, 0, 0.3);
-            text-align: center;
-        }
-
-        h1 {
-            margin-bottom: 1.5rem;
-            color: #2e7d32;
-            font-size: 24px;
-        }
-
-        input[type="text"], input[type="password"] {
-            width: 100%;
-            padding: 12px 12px 12px 35px;
-            margin: 10px 0;
-            border: none;
-            border-radius: 6px;
-            box-shadow: 0 0 5px rgba(0,0,0,0.1);
-            font-weight: 600;
-        }
-
-        input::placeholder {
-            color: #888;
-        }
-
-        button {
-            width: 100%;
-            background-color: #4CAF50;
-            color: white;
-            padding: 12px;
-            border: none;
-            font-weight: bold;
-            border-radius: 6px;
-            margin-top: 15px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #45a049;
-        }
-
-        .extra {
-            margin-top: 20px;
-            font-size: 14px;
-        }
-
-        .extra a {
-            color: #8B4513;
-            font-weight: bold;
-            text-decoration: none;
-        }
-
-        @media (max-width: 400px) {
-            h1 {
-                font-size: 20px;
-            }
-
-            form {
-                padding: 1.5rem;
-            }
-        }
-    </style>
-</head>
-<body>
-    <form action="/login" method="post">
-        <h1>quiz</h1>
-        Usuario: <input type="text" name="username" placeholder="Email"/><br/>
-        Contraseña: <input type="password" name="password" placeholder="Contraseña"/><br/>
-        <button type="submit">Ingresar</button>
-        <div class="extra">
-            Si no tienes cuenta <a href="/register">Regístrate</a>
+        <div class="input-container">
+          <i class="fa fa-user"></i>
+          <input type="text" name="username" placeholder="Email" />
         </div>
-    </form>
-</body>
+
+        <div class="input-container">
+          <i class="fa fa-lock"></i>
+          <input type="password" name="password" placeholder="Contraseña" />
+        </div>
+
+        <button type="submit" class="btn">Ingresar</button>
+
+        <div class="register">
+          Si no tienes cuenta <a href="/register">Regístrate</a>
+        </div>
+      </form>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.9.6/lottie.min.js"></script>
+    <script src="/js/login.js"></script>
+    
+  </body>
 </html>

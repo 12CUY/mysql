@@ -24,10 +24,18 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http.csrf(csrf -> csrf.disable())
-				.authorizeHttpRequests(request -> request.requestMatchers("/register", "/login").permitAll()
+				.authorizeHttpRequests(request -> request
+						.requestMatchers("/register", "/login", "/css/**", "/js/**", "/images/**", "/animation/**",
+								"/style/**", "/templates/**")
+						.permitAll()
 						.anyRequest().authenticated())
-				.formLogin(form -> form.loginPage("/login").loginProcessingUrl("/login").defaultSuccessUrl("/welcome", true).permitAll())
-				.logout(logout -> logout.logoutSuccessUrl("/login").permitAll()).userDetailsService(customUserDetails);
+				.formLogin(form -> form
+						.loginPage("/login")
+						.loginProcessingUrl("/login")
+						.defaultSuccessUrl("/welcome", true)
+						.permitAll())
+				.logout(logout -> logout.logoutSuccessUrl("/login").permitAll())
+				.userDetailsService(customUserDetails);
 		return http.build();
 	}
 
