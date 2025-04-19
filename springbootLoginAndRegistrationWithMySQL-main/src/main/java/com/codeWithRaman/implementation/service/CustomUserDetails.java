@@ -5,7 +5,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.codeWithRaman.implementation.model.User;
+import com.codeWithRaman.implementation.model.Users;
 import com.codeWithRaman.implementation.repository.UserRepository;
 
 @Service
@@ -18,8 +18,7 @@ public class CustomUserDetails implements UserDetailsService{
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		// TODO Auto-generated method stub
-		User user = userRepository.findByUsername(username);
+		Users user = userRepository.findByUsername(username);
 		if(user == null) {
 			throw new UsernameNotFoundException("user not found with givn username");
 		}

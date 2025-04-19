@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.codeWithRaman.implementation.model.User;
+import com.codeWithRaman.implementation.model.Users;
 import com.codeWithRaman.implementation.repository.UserRepository;
 
 @Service
@@ -19,7 +19,7 @@ public class UserService {
 	}
 
 	public void registerUser(String username, String password) {
-		User user = new User();
+		Users user = new Users();
 		user.setUsername(username);
 		user.setPassword(passwordEncoder.encode(password));
 		user.setRole("USER");

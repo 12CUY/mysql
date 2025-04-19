@@ -1,0 +1,152 @@
+/* Estilos básicos para la tienda */
+#nav-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #333;
+    color: white;
+    padding: 10px;
+    z-index: 1000; /* Asegura que el menú esté por encima del contenido */
+  }
+  
+  .frame {
+    text-align: center;
+    padding: 20px;
+    margin-top: 60px; /* Ajuste para el nav fijo */
+  }
+  
+  .icon-grid {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+  }
+  
+  .icon-card {
+    border-radius: 15px;
+    padding: 20px;
+    width: 150px;
+    text-align: center;
+    backdrop-filter: blur(10px);
+    transition: transform 0.3s ease;
+    background: #ffffffcc; /* Fondo semi-transparente */
+    border: 1px solid #af8600a9;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden; /* Evita que el texto se desborde */
+  }
+  
+  .icon-card p {
+    margin: 5px 0;
+    font-size: 20px;
+    white-space: nowrap; /* Evita que el texto se divida en varias líneas */
+    overflow: hidden; /* Oculta el texto que se desborda */
+    text-overflow: ellipsis; /* Muestra "..." si el texto es demasiado largo */
+    max-width: 100%; /* Limita el ancho del texto al ancho de la tarjeta */
+  }
+  
+  .icon-card:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 30px #af8600a9;
+  }
+  
+  .icon {
+    font-size: 50px;
+  }
+  
+  .buy-button {
+    background-color: #00c900;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .buy-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+  
+  .requirement {
+    color: #ff1e00;
+    font-size: 12px;
+    margin-top: 10px;
+  }
+  
+  .sorpresa-button {
+    background-color: #ff5722;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-top: 30px;
+    font-size: 18px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .sorpresa-button:hover {
+    background-color: #e64a19;
+  }
+  
+  /* Estilos responsivos */
+  @media (max-width: 768px) {
+    .frame {
+      padding: 10px;
+    }
+  
+    .icon-card {
+      width: 120px;
+      padding: 15px;
+    }
+  
+    .icon {
+      font-size: 40px;
+    }
+  
+    .buy-button {
+      padding: 8px 16px;
+      font-size: 14px;
+    }
+  
+    .sorpresa-button {
+      padding: 12px 24px;
+      font-size: 16px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .frame {
+      padding: 5px;
+    }
+  
+    .icon-card {
+      width: 100px;
+      padding: 10px;
+    }
+  
+    .icon {
+      font-size: 30px;
+    }
+  
+    .buy-button {
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+  
+    .sorpresa-button {
+      padding: 10px 20px;
+      font-size: 14px;
+    }
+  
+    .requirement {
+      font-size: 10px;
+    }
+  }

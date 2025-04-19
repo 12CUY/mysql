@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🥑 Taxation Land - Tienda</title>
+    <script src="https://use.fontawesome.com/releases/v5.6.1/js/all.js"></script>
+    <!-- SweetAlert2 para alertas -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Animate.css para animaciones -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+    <link rel="stylesheet" href="/style/tienda.css" />
+  </head>
+  <body>
+    <!-- Aquí se cargará el nav dinámicamente -->
+    <div id="nav-container"></div>
+
+    <div class="frame" style="margin-top: 100px">
+      <h2 class="animate__animated animate__bounceIn">Tienda</h2>
+      <p>Bienvenido, <span id="username">Usuario</span></p>
+
+      <!-- Sección de la tienda -->
+      <div class="icon-grid">
+        <!-- Ícono de 🥑 -->
+        <div
+          class="icon-card animate__animated animate__fadeIn"
+          id="avocado-icon"
+        >
+          <span class="icon">🥑</span>
+          <p>Aguacate</p>
+          <button class="buy-button" onclick="buyIcon('avocado')">
+            Comprar
+          </button>
+          <p class="requirement" id="avocado-requirement">
+            Completa el nivel Fácil para desbloquear
+          </p>
+        </div>
+        <!-- Ícono de 🍎 -->
+        <div
+          class="icon-card animate__animated animate__fadeIn"
+          id="apple-icon"
+        >
+          <span class="icon">🍎</span>
+          <p>Manzana</p>
+          <button class="buy-button" onclick="buyIcon('apple')">Comprar</button>
+          <p class="requirement" id="apple-requirement">
+            Completa el nivel Medio para desbloquear
+          </p>
+        </div>
+        <!-- Ícono de 🍌 -->
+        <div
+          class="icon-card animate__animated animate__fadeIn"
+          id="banana-icon"
+        >
+          <span class="icon">🍌</span>
+          <p>Banana</p>
+          <button class="buy-button" onclick="buyIcon('banana')">
+            Comprar
+          </button>
+          <p class="requirement" id="banana-requirement">
+            Completa el nivel Difícil para desbloquear
+          </p>
+        </div>
+      </div>
+
+      <!-- Botón de sorpresa -->
+      <button
+        class="sorpresa-button animate__animated animate__pulse"
+        onclick="checkSorpresa()"
+      >
+        ¡Botón Sorpresa!
+      </button>
+    </div>
+    <script src="style/js/tienda.js"></script>
+    <script>
+      fetch("/templates/nav.html")
+        .then((response) => {
+          if (!response.ok) throw new Error("No se pudo cargar el navbar.");
+          return response.text();
+        })
+        .then((html) => {
+          document.getElementById("nav-container").innerHTML = html;
+        })
+        .catch((error) => console.error("Error al cargar el nav:", error));
+    </script>
+  </body>
+</html>

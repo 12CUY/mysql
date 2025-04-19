@@ -28,6 +28,7 @@ public class SecurityConfig {
 						.requestMatchers("/register", "/login", "/css/**", "/js/**", "/images/**", "/animation/**",
 								"/style/**", "/templates/**")
 						.permitAll()
+						.requestMatchers("/shop", "/leaderboard").authenticated()
 						.anyRequest().authenticated())
 				.formLogin(form -> form
 						.loginPage("/login")
