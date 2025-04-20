@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🥑 Taxation Land - Juego Trivia - Fácil</title>
+    <link rel="stylesheet" href="/style/tri.css" />
+    <!-- SweetAlert CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"
+    />
+    <!-- Lottie JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.9.1/lottie.min.js"></script>
+  </head>
+  <body>
+    <!-- Menú superior -->
+    <div id="nav-container"></div>
+
+    <!-- Contenido principal: Animación y juego -->
+    <div class="game-container">
+      <!-- Columna izquierda: Animación del aguacate -->
+      <div class="animation-container" id="lottie"></div>
+
+      <!-- Columna derecha: Juego de preguntas y respuestas -->
+      <div class="question-container">
+        <h1>Pregunta <span id="question-number">1</span> - 3</h1>
+        <div class="level-info">
+          <span class="level-tag">NIVEL: FÁCIL</span>
+          <span class="timer"
+            >Temporizador: <span id="time-left">00:00</span></span
+          >
+        </div>
+        <div class="description">
+          <p id="desc">
+            La contabilidad es una herramienta fundamental para gestionar
+            recursos y tomar decisiones fundamentales.
+          </p>
+        </div>
+        <div class="question">
+          <h2 id="question-text">¿Qué es la contabilidad?</h2>
+          <div class="options" id="options-container">
+            <!-- Las opciones se cargarán dinámicamente -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SweetAlert JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- configuraciones internas -->
+    <script src="/js/juegofacil.js"></script>
+  </body>
+</html>
