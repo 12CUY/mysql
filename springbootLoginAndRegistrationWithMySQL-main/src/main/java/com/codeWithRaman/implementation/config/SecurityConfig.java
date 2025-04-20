@@ -33,7 +33,7 @@ public class SecurityConfig {
 				.formLogin(form -> form
 						.loginPage("/login")
 						.loginProcessingUrl("/login")
-						.defaultSuccessUrl("/welcome", true)
+						.defaultSuccessUrl("/dashboard", true)
 						.permitAll())
 				.logout(logout -> logout.logoutSuccessUrl("/login").permitAll())
 				.userDetailsService(customUserDetails);

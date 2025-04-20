@@ -29,8 +29,8 @@ public class AuthController {
 		return "login";
 	}
 	
-	@GetMapping("/welcome")
-	public String welcome() {
-		return "welcome";
+	@GetMapping("/dashboard")
+	public String dashboard() {
+		return "dashboard";
 	}
 }
