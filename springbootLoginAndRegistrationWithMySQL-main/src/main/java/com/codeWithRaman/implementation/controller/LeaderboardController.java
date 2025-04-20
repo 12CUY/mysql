@@ -17,7 +17,7 @@ public class LeaderboardController {
 
     @GetMapping("/leaderboard")
     public String leaderboard(Model model) {
-        model.addAttribute("scores", gameService.getTopScores());
+        
         return "rankings";
     }
 }

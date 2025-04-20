@@ -26,7 +26,7 @@ public class SecurityConfig {
 		http.csrf(csrf -> csrf.disable())
 				.authorizeHttpRequests(request -> request
 						.requestMatchers("/register", "/login", "/css/**", "/js/**", "/images/**", "/animation/**",
-								"/style/**", "/templates/**")
+								"/style/**", "/templates/**" , "/facil", "/api-facil")
 						.permitAll()
 						.requestMatchers("/shop", "/leaderboard").authenticated()
 						.anyRequest().authenticated())

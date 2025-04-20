@@ -1,23 +1,19 @@
 package com.codeWithRaman.implementation.service;
 
+import com.codeWithRaman.implementation.model.Question;
+import com.codeWithRaman.implementation.repository.QuestionRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.codeWithRaman.implementation.model.UserScore;
-import com.codeWithRaman.implementation.repository.UserScoreRepository;
 
 import java.util.List;
 
 @Service
 public class GameService {
 
-    private final UserScoreRepository userScoreRepository;
+    @Autowired
+    private QuestionRepository questionRepository;
 
-    public GameService(UserScoreRepository userScoreRepository) {
-        this.userScoreRepository = userScoreRepository;
+    public List<Question> getQuestionsByLevel(Question.Level level) {
+        return questionRepository.findByLevel(level);
     }
-
-    public List<UserScore> getTopScores() {
-        return userScoreRepository.findTop10ByOrderByScoreDesc();
-    }
-
-    // Otros métodos para manejar la lógica del juego
 }
