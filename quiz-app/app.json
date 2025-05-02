@@ -1,0 +1,26 @@
+{
+  "expo": {
+    "name": "quiz-app",
+    "slug": "quiz-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/hoboring.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/hoboring.png"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/hoboring.png"
+      },
+      "edgeToEdgeEnabled": true
+    },
+    "web": {
+      "favicon": "./assets/hoboring.png"
+    }
+  }
+}
