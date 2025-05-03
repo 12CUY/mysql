@@ -5,10 +5,11 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { MaterialIcons } from '@expo/vector-icons';
 
-// Importar las pantallas que vamos a crear
+// Importar las pantallas
 import LoginScreen from './screens/LoginScreen';
 import RegisterScreen from './screens/RegisterScreen';
 import DashboardScreen from './screens/DashboardScreen';
+import StoreScreen from './screens/StoreScreen'; // Nueva pantalla de tienda
 
 const Stack = createStackNavigator();
 
@@ -45,6 +46,11 @@ export default function App() {
             headerLeft: null // Oculta el botón de retroceso
           }}
         />
+        <Stack.Screen 
+          name="Store" 
+          component={StoreScreen} 
+          options={{ title: 'Tienda de Recompensas' }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -53,6 +59,6 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#e8f5e9', // Verde muy claro
+    backgroundColor: '#e8f5e9',
   },
 });

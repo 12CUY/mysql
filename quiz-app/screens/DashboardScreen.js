@@ -3,25 +3,31 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal, Button } f
 import { MaterialIcons } from '@expo/vector-icons';
 import QuizScreen from './QuizScreen';
 
-export default function DashboardScreen() {
+export default function DashboardScreen({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [showQuiz, setShowQuiz] = useState(false);
   const [difficulty, setDifficulty] = useState('');
   const [results, setResults] = useState({
-    'Fácil': { score: 0, time: 0, completed: false },
-    'Medio': { score: 0, time: 0, completed: false },
-    'Difícil': { score: 0, time: 0, completed: false }
+    'Fácil': { score: 0, time: 0, completed: false, perfect: false },
+    'Medio': { score: 0, time: 0, completed: false, perfect: false },
+    'Difícil': { score: 0, time: 0, completed: false, perfect: false }
   });
 
+  const allCompleted = Object.values(results).every(result => result.completed);
+
   const handleQuizComplete = (correctAnswers, timeTaken) => {
-    setResults(prev => ({
-      ...prev,
+    const isPerfect = correctAnswers === 3; // Asumiendo que hay 3 preguntas
+    const newResults = {
+      ...results,
       [difficulty]: {
         score: correctAnswers,
         time: timeTaken,
-        completed: true
+        completed: true,
+        perfect: isPerfect
       }
-    }));
+    };
+    
+    setResults(newResults);
     setShowQuiz(false);
   };
 
@@ -46,6 +52,13 @@ export default function DashboardScreen() {
             <Text style={styles.headerText}>Dashboard</Text>
           </View>
 
+          {allCompleted && (
+            <View style={styles.completionBanner}>
+              <MaterialIcons name="stars" size={30} color="#ffd700" />
+              <Text style={styles.completionText}>¡Has completado todos los niveles!</Text>
+            </View>
+          )}
+
           <View style={styles.resultsContainer}>
             {Object.entries(results).map(([difficulty, result]) => (
               <View 
@@ -69,25 +82,47 @@ export default function DashboardScreen() {
                     <View style={styles.progressBar}>
                       <View style={[styles.progressFill, { width: `${(result.score/3)*100}%` }]} />
                     </View>
+                    {result.perfect && (
+                      <Text style={styles.perfectText}>¡Perfecto!</Text>
+                    )}
                   </>
                 ) : (
                   <Text style={styles.incompleteText}>No completado</Text>
                 )}
 
                 <TouchableOpacity 
-                  style={styles.cardButton}
+                  style={[
+                    styles.cardButton,
+                    result.perfect && styles.disabledButton
+                  ]}
                   onPress={() => {
-                    setDifficulty(difficulty);
-                    setShowQuiz(true);
+                    if (!result.perfect) {
+                      setDifficulty(difficulty);
+                      setShowQuiz(true);
+                    }
                   }}
+                  disabled={result.perfect}
                 >
                   <Text style={styles.cardButtonText}>
-                    {result.completed ? 'Intentar de nuevo' : 'Comenzar'}
+                    {result.completed ? 
+                      (result.perfect ? 'Completado perfecto' : 'Intentar de nuevo') 
+                      : 'Comenzar'}
                   </Text>
                 </TouchableOpacity>
               </View>
             ))}
           </View>
+
+          <TouchableOpacity 
+            style={styles.storeButton}
+            onPress={() => navigation.navigate('Store', { 
+              results: results,
+              allCompleted: allCompleted 
+            })}
+          >
+            <MaterialIcons name="store" size={24} color="white" />
+            <Text style={styles.storeButtonText}>Ir a la Tienda</Text>
+          </TouchableOpacity>
 
           <Modal
             animationType="slide"
@@ -154,6 +189,22 @@ const styles = StyleSheet.create({
     color: '#2e7d32',
     marginLeft: 10,
   },
+  completionBanner: {
+    backgroundColor: '#fff',
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 20,
+    borderColor: '#ffd700',
+    borderWidth: 2,
+  },
+  completionText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#2e7d32',
+    marginLeft: 10,
+  },
   resultsContainer: {
     width: '100%',
     marginBottom: 20,
@@ -183,6 +234,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
     marginVertical: 3,
+  },
+  perfectText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#4CAF50',
+    marginVertical: 5,
   },
   incompleteText: {
     fontSize: 16,
@@ -244,8 +301,27 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginTop: 10,
   },
+  disabledButton: {
+    backgroundColor: '#9E9E9E',
+  },
   cardButtonText: {
     color: 'white',
     fontWeight: 'bold',
+  },
+  storeButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#ff5722',
+    padding: 15,
+    borderRadius: 10,
+    marginTop: 10,
+    elevation: 3,
+  },
+  storeButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 18,
+    marginLeft: 10,
   },
 });
