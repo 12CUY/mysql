@@ -1,12 +1,54 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Animated, Easing } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import LottieView from 'lottie-react-native';
 
 export default function RegisterScreen({ navigation }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  
+  // Animaciones
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(30)).current;
+  const buttonScale = useRef(new Animated.Value(1)).current;
+  const avocadoScale = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    // Animación de entrada
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 800,
+        easing: Easing.out(Easing.exp),
+        useNativeDriver: true,
+      })
+    ]).start();
+
+    // Animación de pulso para el aguacate
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(avocadoScale, {
+          toValue: 1.05,
+          duration: 1000,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(avocadoScale, {
+          toValue: 1,
+          duration: 1000,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  }, []);
 
   const handleRegister = () => {
     if (!name || !email || !password) {
@@ -16,122 +58,220 @@ export default function RegisterScreen({ navigation }) {
 
     setLoading(true);
     
-    // Simulación de registro
+    // Animación al presionar el botón
+    Animated.sequence([
+      Animated.timing(buttonScale, {
+        toValue: 0.95,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(buttonScale, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
     setTimeout(() => {
       setLoading(false);
       navigation.reset({
         index: 0,
-        routes: [{ name: 'Main' }],
+        routes: [{ name: 'Dashboard' }],
       });
     }, 1500);
   };
 
+  const goToLogin = () => {
+    // Animación al ir al login
+    Animated.timing(fadeAnim, {
+      toValue: 0,
+      duration: 300,
+      useNativeDriver: true,
+    }).start(() => navigation.navigate('Login'));
+  };
+
   return (
-    <View style={styles.container}>
-      <MaterialIcons name="person-add" size={100} color="#2e7d32" style={styles.icon} />
-      
-      <Text style={styles.title}>Registro</Text>
-      
-      <View style={styles.inputContainer}>
-        <MaterialIcons name="person" size={24} color="#2e7d32" />
-        <TextInput
-          style={styles.input}
-          placeholder="Nombre completo"
-          value={name}
-          onChangeText={setName}
-        />
-      </View>
-      
-      <View style={styles.inputContainer}>
-        <MaterialIcons name="email" size={24} color="#2e7d32" />
-        <TextInput
-          style={styles.input}
-          placeholder="Correo electrónico"
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
-      </View>
-      
-      <View style={styles.inputContainer}>
-        <MaterialIcons name="lock" size={24} color="#2e7d32" />
-        <TextInput
-          style={styles.input}
-          placeholder="Contraseña"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
-      </View>
-      
-      <TouchableOpacity 
-        style={styles.button} 
-        onPress={handleRegister}
-        disabled={loading}
+    <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
+      <Animated.View 
+        style={[
+          styles.header,
+          { transform: [{ translateY: slideAnim }] }
+        ]}
       >
-        <Text style={styles.buttonText}>
-          {loading ? 'Registrando...' : 'Registrarse'}
-        </Text>
-      </TouchableOpacity>
-      
-      <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-        <Text style={styles.link}>¿Ya tienes cuenta? Inicia sesión</Text>
-      </TouchableOpacity>
-    </View>
+        <Animated.View style={{ transform: [{ scale: avocadoScale }] }}>
+          <LottieView
+            source={require('../assets/Agucate.json')}
+            autoPlay
+            loop
+            style={styles.lottieAnimation}
+          />
+        </Animated.View>
+        <Text style={styles.title}>Taxation Land</Text>
+        <Text style={styles.subtitle}>Registrate</Text>
+      </Animated.View>
+
+      <Animated.View 
+        style={[
+          styles.formContainer,
+          { transform: [{ translateY: slideAnim }] }
+        ]}
+      >
+        <Animated.View style={[styles.inputWrapper, { opacity: fadeAnim }]}>
+          <View style={styles.inputContainer}>
+            <MaterialIcons name="person" size={24} color="#2e7d32" style={styles.icon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Nombre de usuario"
+              placeholderTextColor="#999"
+              value={name}
+              onChangeText={setName}
+            />
+          </View>
+        </Animated.View>
+        
+        <Animated.View 
+          style={[
+            styles.inputWrapper, 
+            { 
+              opacity: fadeAnim,
+              transform: [{ translateY: slideAnim }] 
+            }
+          ]}
+        >
+          <View style={styles.inputContainer}>
+            <MaterialIcons name="email" size={24} color="#2e7d32" style={styles.icon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Email"
+              placeholderTextColor="#999"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+          </View>
+        </Animated.View>
+        
+        <Animated.View 
+          style={[
+            styles.inputWrapper, 
+            { 
+              opacity: fadeAnim,
+              transform: [{ translateY: slideAnim }] 
+            }
+          ]}
+        >
+          <View style={styles.inputContainer}>
+            <MaterialIcons name="lock" size={24} color="#2e7d32" style={styles.icon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Contraseña"
+              placeholderTextColor="#999"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+            />
+          </View>
+        </Animated.View>
+
+        <Animated.View style={{ transform: [{ scale: buttonScale }] }}>
+          <TouchableOpacity 
+            style={styles.button} 
+            onPress={handleRegister}
+            disabled={loading}
+          >
+            <Text style={styles.buttonText}>
+              {loading ? 'Registrando...' : 'Ingresar'}
+            </Text>
+          </TouchableOpacity>
+        </Animated.View>
+      </Animated.View>
+
+      <Animated.View style={{ opacity: fadeAnim }}>
+        <TouchableOpacity 
+          onPress={goToLogin}
+          style={styles.loginLink}
+        >
+          <Text style={styles.loginText}>Si ya tienes cuenta Inicia sesión</Text>
+        </TouchableOpacity>
+      </Animated.View>
+    </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#e8f5e9',
-    alignItems: 'center',
+    backgroundColor: '#c9df8f',
     justifyContent: 'center',
-    padding: 20,
+    padding: 30,
   },
-  icon: {
-    marginBottom: 30,
+  header: {
+    alignItems: 'center',
+    marginBottom: 40,
+  },
+  lottieAnimation: {
+    width: 120,
+    height: 120,
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
     color: '#2e7d32',
-    marginBottom: 30,
+    marginTop: 10,
+  },
+  subtitle: {
+    fontSize: 20,
+    color: '#495057',
+    marginTop: 5,
+  },
+  formContainer: {
+    width: '100%',
+  },
+  inputWrapper: {
+    borderWidth: 2,
+    borderColor: '#2e7d32',
+    borderRadius: 15,
+    marginBottom: 20,
+    backgroundColor: 'white',
+    overflow: 'hidden',
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    width: '100%',
-    marginBottom: 15,
-    paddingHorizontal: 10,
-    backgroundColor: 'white',
-    borderRadius: 5,
-    elevation: 2,
+    paddingHorizontal: 15,
+  },
+  icon: {
+    marginRight: 10,
   },
   input: {
     flex: 1,
     height: 50,
-    paddingLeft: 10,
+    fontSize: 16,
+    color: '#495057',
   },
   button: {
     width: '100%',
     height: 50,
     backgroundColor: '#2e7d32',
-    borderRadius: 5,
+    borderRadius: 15,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 20,
-    marginBottom: 15,
+    marginTop: 10,
+    elevation: 3,
   },
   buttonText: {
     color: 'white',
     fontSize: 18,
     fontWeight: 'bold',
   },
-  link: {
+  loginLink: {
+    marginTop: 25,
+    alignSelf: 'center',
+  },
+  loginText: {
     color: '#2e7d32',
-    marginTop: 15,
-    textDecorationLine: 'underline',
+    fontSize: 16,
+    textDecorationLine: 'none',
   },
 });

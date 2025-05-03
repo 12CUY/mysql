@@ -1,5 +1,17 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal, Button } from 'react-native';
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  TouchableOpacity, 
+  ScrollView, 
+  Modal, 
+  Button,
+  Animated,
+  Easing,
+  BackHandler,
+  Alert
+} from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import QuizScreen from './QuizScreen';
 
@@ -13,10 +25,63 @@ export default function DashboardScreen({ navigation }) {
     'Difícil': { score: 0, time: 0, completed: false, perfect: false }
   });
 
+  // Animaciones
+  const fadeAnim = useState(new Animated.Value(0))[0];
+  const scaleAnim = useState(new Animated.Value(0.8))[0];
+  const slideAnim = useState(new Animated.Value(300))[0];
+  const rotateAnim = useState(new Animated.Value(0))[0];
+
+  React.useEffect(() => {
+    // Animación de entrada
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scaleAnim, {
+        toValue: 1,
+        duration: 800,
+        easing: Easing.elastic(1),
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 800,
+        easing: Easing.out(Easing.exp),
+        useNativeDriver: true,
+      })
+    ]).start();
+
+    // Configurar el botón de retroceso físico
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      handleBackPress
+    );
+
+    return () => backHandler.remove();
+  }, []);
+
+  const handleBackPress = () => {
+    Alert.alert(
+      'Salir',
+      '¿Estás seguro que quieres cerrar sesión?',
+      [
+        {
+          text: 'Cancelar',
+          onPress: () => null,
+          style: 'cancel',
+        },
+        { text: 'Sí', onPress: () => navigation.navigate('Login') },
+      ]
+    );
+    return true;
+  };
+
   const allCompleted = Object.values(results).every(result => result.completed);
 
   const handleQuizComplete = (correctAnswers, timeTaken) => {
-    const isPerfect = correctAnswers === 3; // Asumiendo que hay 3 preguntas
+    const isPerfect = correctAnswers === 3;
     const newResults = {
       ...results,
       [difficulty]: {
@@ -29,6 +94,27 @@ export default function DashboardScreen({ navigation }) {
     
     setResults(newResults);
     setShowQuiz(false);
+    
+    // Animación de celebración al completar
+    if (Object.values(newResults).every(r => r.completed)) {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(rotateAnim, {
+            toValue: 1,
+            duration: 1000,
+            easing: Easing.linear,
+            useNativeDriver: true,
+          }),
+          Animated.timing(rotateAnim, {
+            toValue: 0,
+            duration: 1000,
+            easing: Easing.linear,
+            useNativeDriver: true,
+          }),
+        ]),
+        { iterations: 3 }
+      ).start();
+    }
   };
 
   const startQuiz = (difficulty) => {
@@ -36,6 +122,11 @@ export default function DashboardScreen({ navigation }) {
     setModalVisible(false);
     setShowQuiz(true);
   };
+
+  const rotateInterpolate = rotateAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg'],
+  });
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -47,25 +138,60 @@ export default function DashboardScreen({ navigation }) {
         />
       ) : (
         <>
-          <View style={styles.header}>
+          <Animated.View 
+            style={[
+              styles.header,
+              {
+                opacity: fadeAnim,
+                transform: [{ scale: scaleAnim }]
+              }
+            ]}
+          >
             <MaterialIcons name="dashboard" size={40} color="#2e7d32" />
             <Text style={styles.headerText}>Dashboard</Text>
-          </View>
+            <TouchableOpacity 
+              style={styles.logoutButton}
+              onPress={handleBackPress}
+            >
+              <MaterialIcons name="exit-to-app" size={28} color="#d32f2f" />
+            </TouchableOpacity>
+          </Animated.View>
 
           {allCompleted && (
-            <View style={styles.completionBanner}>
+            <Animated.View 
+              style={[
+                styles.completionBanner,
+                {
+                  transform: [
+                    { rotate: rotateInterpolate },
+                    { scale: rotateAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [1, 1.05]
+                    })}
+                  ]
+                }
+              ]}
+            >
               <MaterialIcons name="stars" size={30} color="#ffd700" />
               <Text style={styles.completionText}>¡Has completado todos los niveles!</Text>
-            </View>
+            </Animated.View>
           )}
 
           <View style={styles.resultsContainer}>
-            {Object.entries(results).map(([difficulty, result]) => (
-              <View 
+            {Object.entries(results).map(([difficulty, result], index) => (
+              <Animated.View 
                 key={difficulty} 
                 style={[
                   styles.resultCard,
-                  !result.completed && styles.incompleteCard
+                  !result.completed && styles.incompleteCard,
+                  {
+                    opacity: fadeAnim,
+                    transform: [
+                      { translateY: slideAnim },
+                      { scale: scaleAnim }
+                    ],
+                    marginTop: index === 0 ? 0 : 20
+                  }
                 ]}
               >
                 <MaterialIcons 
@@ -80,7 +206,20 @@ export default function DashboardScreen({ navigation }) {
                     <Text style={styles.resultText}>Preguntas correctas: {result.score}/3</Text>
                     <Text style={styles.resultText}>Tiempo: {result.time} segundos</Text>
                     <View style={styles.progressBar}>
-                      <View style={[styles.progressFill, { width: `${(result.score/3)*100}%` }]} />
+                      <Animated.View 
+                        style={[
+                          styles.progressFill, 
+                          { 
+                            width: `${(result.score/3)*100}%`,
+                            transform: [{
+                              scaleX: scaleAnim.interpolate({
+                                inputRange: [0.8, 1],
+                                outputRange: [0, 1]
+                              })
+                            }]
+                          }
+                        ]} 
+                      />
                     </View>
                     {result.perfect && (
                       <Text style={styles.perfectText}>¡Perfecto!</Text>
@@ -109,20 +248,27 @@ export default function DashboardScreen({ navigation }) {
                       : 'Comenzar'}
                   </Text>
                 </TouchableOpacity>
-              </View>
+              </Animated.View>
             ))}
           </View>
 
-          <TouchableOpacity 
-            style={styles.storeButton}
-            onPress={() => navigation.navigate('Store', { 
-              results: results,
-              allCompleted: allCompleted 
-            })}
+          <Animated.View
+            style={{
+              opacity: fadeAnim,
+              transform: [{ translateY: slideAnim }]
+            }}
           >
-            <MaterialIcons name="store" size={24} color="white" />
-            <Text style={styles.storeButtonText}>Ir a la Tienda</Text>
-          </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.storeButton}
+              onPress={() => navigation.navigate('Store', { 
+                results: results,
+                allCompleted: allCompleted 
+              })}
+            >
+              <MaterialIcons name="store" size={24} color="white" />
+              <Text style={styles.storeButtonText}>Ir a la Tienda</Text>
+            </TouchableOpacity>
+          </Animated.View>
 
           <Modal
             animationType="slide"
@@ -131,7 +277,15 @@ export default function DashboardScreen({ navigation }) {
             onRequestClose={() => setModalVisible(false)}
           >
             <View style={styles.modalContainer}>
-              <View style={styles.modalContent}>
+              <Animated.View 
+                style={[
+                  styles.modalContent,
+                  {
+                    transform: [{ scale: scaleAnim }],
+                    opacity: fadeAnim
+                  }
+                ]}
+              >
                 <Text style={styles.modalTitle}>Selecciona dificultad</Text>
                 
                 <TouchableOpacity 
@@ -163,7 +317,7 @@ export default function DashboardScreen({ navigation }) {
                   onPress={() => setModalVisible(false)}
                   color="#2e7d32"
                 />
-              </View>
+              </Animated.View>
             </View>
           </Modal>
         </>
@@ -182,12 +336,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 30,
+    justifyContent: 'space-between',
   },
   headerText: {
     fontSize: 28,
     fontWeight: 'bold',
     color: '#2e7d32',
     marginLeft: 10,
+    flex: 1,
+  },
+  logoutButton: {
+    padding: 5,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#d32f2f',
   },
   completionBanner: {
     backgroundColor: '#fff',
