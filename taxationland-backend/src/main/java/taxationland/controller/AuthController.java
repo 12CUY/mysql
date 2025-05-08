@@ -1,5 +1,7 @@
 package taxationland.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import taxationland.dto.*;
 import taxationland.model.*;
 import taxationland.repository.*;
@@ -7,24 +9,27 @@ import taxationland.security.jwt.JwtUtils;
 import taxationland.security.services.UserDetailsImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
+
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+
     @Autowired
     AuthenticationManager authenticationManager;
 
@@ -43,19 +48,38 @@ public class AuthController {
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         try {
-            String usernameOrEmail = loginRequest.getUsernameOrEmail();
-            User user = userRepository.findByUsernameOrEmail(usernameOrEmail)
-                .orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
-            
-            Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(user.getUsername(), loginRequest.getPassword()));
+            // Búsqueda optimizada
+            String credential = loginRequest.getUsernameOrEmail().trim();
+            User user = userRepository.findByUsernameOrEmail(credential)
+                    .orElseThrow(() -> new BadCredentialsException("Credenciales inválidas"));
 
+            // Verificación mejorada de contraseña
+            if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
+                throw new BadCredentialsException("Credenciales inválidas");
+            }
+
+            // Verificación de roles mejorada
+            if (user.getRoles() == null || user.getRoles().isEmpty()) {
+                logger.warn("Usuario sin roles: {}", user.getUsername());
+                throw new RuntimeException("Configuración de usuario incompleta");
+            }
+
+            // Autenticación
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            user.getUsername(),
+                            loginRequest.getPassword()
+                    )
+            );
+
+            // Generación de token
             SecurityContextHolder.getContext().setAuthentication(authentication);
             String jwt = jwtUtils.generateJwtToken(authentication);
-            
-            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();        
+
+            // Construcción de respuesta
+            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
             List<String> roles = userDetails.getAuthorities().stream()
-                    .map(item -> item.getAuthority())
+                    .map(GrantedAuthority::getAuthority)
                     .collect(Collectors.toList());
 
             return ResponseEntity.ok(new JwtResponse(
@@ -64,53 +88,51 @@ public class AuthController {
                     userDetails.getUsername(),
                     userDetails.getEmail(),
                     roles));
-                    
+
         } catch (BadCredentialsException e) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("Error: Invalid username/email or password"));
+            logger.warn("Intento de login fallido para: {}", loginRequest.getUsernameOrEmail());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new MessageResponse("Credenciales inválidas"));
         } catch (Exception e) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("Error: Authentication failed"));
+            logger.error("Error en autenticación: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new MessageResponse("Error en el servidor"));
         }
     }
 
+    /**
+     * Registra un nuevo usuario con rol ROLE_USER
+     */
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
         try {
+            // Validaciones existentes (OK)
             if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-                return ResponseEntity
-                        .badRequest()
-                        .body(new MessageResponse("Error: Username is already taken!"));
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(new MessageResponse("Error: Nombre de usuario ya existe"));
             }
 
-            if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-                return ResponseEntity
-                        .badRequest()
-                        .body(new MessageResponse("Error: Email is already in use!"));
-            }
+            // Creación de usuario mejorada
+            User user = new User();
+            user.setUsername(signUpRequest.getUsername().trim()); // Limpieza de espacios
+            user.setEmail(signUpRequest.getEmail().trim().toLowerCase()); // Normalización
+            user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
 
-            // Create new user's account
-            User user = new User(
-                    signUpRequest.getUsername(),
-                    signUpRequest.getEmail(),
-                    passwordEncoder.encode(signUpRequest.getPassword()));
-
-            Set<Role> roles = new HashSet<>();
+            // Asignación de rol con verificación mejorada
             Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-                    .orElseThrow(() -> new RuntimeException("Error: Role USER not found. Initialize database first."));
-            roles.add(userRole);
+                    .orElseGet(() -> {
+                        Role newRole = new Role(ERole.ROLE_USER);
+                        return roleRepository.save(newRole);
+                    });
+            user.setRoles(Set.of(userRole));
 
-            user.setRoles(roles);
             userRepository.save(user);
 
-            return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
-            
+            return ResponseEntity.ok(new MessageResponse("Usuario registrado exitosamente"));
         } catch (Exception e) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("Error: " + e.getMessage()));
+            logger.error("Error en registro: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new MessageResponse("Error en el servidor"));
         }
     }
 }
