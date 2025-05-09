@@ -18,6 +18,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -106,33 +107,39 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
         try {
-            // Validaciones existentes (OK)
+            // Validación mejorada
             if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(new MessageResponse("Error: Nombre de usuario ya existe"));
+                return ResponseEntity.badRequest()
+                        .body(new MessageResponse("Error: El nombre de usuario ya está en uso"));
             }
 
-            // Creación de usuario mejorada
-            User user = new User();
-            user.setUsername(signUpRequest.getUsername().trim()); // Limpieza de espacios
-            user.setEmail(signUpRequest.getEmail().trim().toLowerCase()); // Normalización
-            user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
+            if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+                return ResponseEntity.badRequest()
+                        .body(new MessageResponse("Error: El email ya está en uso"));
+            }
 
-            // Asignación de rol con verificación mejorada
+            // Crear nuevo usuario
+            User user = new User(
+                    signUpRequest.getUsername(),
+                    signUpRequest.getEmail(),
+                    passwordEncoder.encode(signUpRequest.getPassword())
+            );
+
+            // Asignar rol
+            Set<Role> roles = new HashSet<>();
             Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-                    .orElseGet(() -> {
-                        Role newRole = new Role(ERole.ROLE_USER);
-                        return roleRepository.save(newRole);
-                    });
-            user.setRoles(Set.of(userRole));
+                    .orElseThrow(() -> new RuntimeException("Error: Rol no encontrado"));
+            roles.add(userRole);
+            user.setRoles(roles);
 
             userRepository.save(user);
 
             return ResponseEntity.ok(new MessageResponse("Usuario registrado exitosamente"));
+
         } catch (Exception e) {
-            logger.error("Error en registro: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new MessageResponse("Error en el servidor"));
+            logger.error("Error en registro: ", e);
+            return ResponseEntity.internalServerError()
+                    .body(new MessageResponse("Error interno del servidor"));
         }
     }
 }
