@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Animated, Easing } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Animated, Easing, Alert, ActivityIndicator } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import LottieView from 'lottie-react-native';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function LoginScreen({ navigation }) {
-  const [email, setEmail] = useState('');
+  const [usernameOrEmail, setUsernameOrEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
   
   // Animaciones
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -49,7 +51,14 @@ export default function LoginScreen({ navigation }) {
     ).start();
   }, []);
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
+    if (!usernameOrEmail || !password) {
+      Alert.alert('Error', 'Por favor completa todos los campos');
+      return;
+    }
+
+    setLoading(true);
+    
     // Animación al presionar el botón
     Animated.sequence([
       Animated.timing(buttonScale, {
@@ -62,10 +71,66 @@ export default function LoginScreen({ navigation }) {
         duration: 100,
         useNativeDriver: true,
       }),
-    ]).start(() => {
-      // Aquí iría la lógica de autenticación
-      navigation.navigate('Dashboard');
-    });
+    ]).start();
+
+    try {
+      const response = await axios.post('http://192.168.1.11:8080/api/auth/signin', {
+        usernameOrEmail: usernameOrEmail.trim(),
+        password: password
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      });
+
+      console.log('Respuesta de login:', response.data);
+      
+      // Guardar el token en AsyncStorage
+      if (response.data.token) {
+        await AsyncStorage.setItem('userToken', response.data.token);
+        
+        // Guardar información del usuario si está disponible
+        if (response.data.id) {
+          const userData = {
+            id: response.data.id,
+            username: response.data.username,
+            email: response.data.email,
+            roles: response.data.roles
+          };
+          await AsyncStorage.setItem('userData', JSON.stringify(userData));
+        }
+        
+        // Navegar al dashboard
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Dashboard' }],
+        });
+      } else {
+        throw new Error('No se recibió token de autenticación');
+      }
+
+    } catch (error) {
+      console.error('Error en login:', error.response?.data || error.message);
+      
+      let errorMessage = 'Error al iniciar sesión';
+      if (error.response) {
+        // Manejo de errores específicos del backend
+        if (error.response.data && error.response.data.message) {
+          errorMessage = error.response.data.message;
+        } else if (error.response.status === 401) {
+          errorMessage = 'Credenciales inválidas';
+        } else if (error.response.status === 400) {
+          errorMessage = 'Datos inválidos';
+        }
+      } else if (error.request) {
+        errorMessage = 'No se recibió respuesta del servidor';
+      }
+      
+      Alert.alert('Error', errorMessage);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const goToRegister = () => {
@@ -105,15 +170,15 @@ export default function LoginScreen({ navigation }) {
       >
         <Animated.View style={[styles.inputWrapper, { opacity: fadeAnim }]}>
           <View style={styles.inputContainer}>
-            <MaterialIcons name="email" size={24} color="#2e7d32" style={styles.icon} />
+            <MaterialIcons name="person" size={24} color="#2e7d32" style={styles.icon} />
             <TextInput
               style={styles.input}
-              placeholder="Correo electrónico"
+              placeholder="Usuario o correo electrónico"
               placeholderTextColor="#999"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
+              value={usernameOrEmail}
+              onChangeText={setUsernameOrEmail}
               autoCapitalize="none"
+              autoCorrect={false}
             />
           </View>
         </Animated.View>
@@ -136,16 +201,22 @@ export default function LoginScreen({ navigation }) {
               value={password}
               onChangeText={setPassword}
               secureTextEntry
+              autoCapitalize="none"
             />
           </View>
         </Animated.View>
 
         <Animated.View style={{ transform: [{ scale: buttonScale }] }}>
           <TouchableOpacity 
-            style={styles.button} 
+            style={[styles.button, loading && styles.buttonDisabled]}
             onPress={handleLogin}
+            disabled={loading}
           >
-            <Text style={styles.buttonText}>Ingresar</Text>
+            {loading ? (
+              <ActivityIndicator color="white" />
+            ) : (
+              <Text style={styles.buttonText}>Ingresar</Text>
+            )}
           </TouchableOpacity>
         </Animated.View>
       </Animated.View>
@@ -223,6 +294,9 @@ const styles = StyleSheet.create({
     marginTop: 10,
     elevation: 3,
   },
+  buttonDisabled: {
+    backgroundColor: '#6c757d',
+  },
   buttonText: {
     color: 'white',
     fontSize: 18,
@@ -235,6 +309,6 @@ const styles = StyleSheet.create({
   registerText: {
     color: '#2e7d32',
     fontSize: 16,
-    textDecorationLine: 'none',
+    textDecorationLine: 'underline',
   },
 });
